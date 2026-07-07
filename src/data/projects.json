@@ -108,6 +108,34 @@
         "github": ""
       },
       "screenshot": "/screenshots/projects/attention-research.png"
+    },
+    {
+      "id": "ngomongaja",
+      "title": "NgomongAja",
+      "dates": "2026 – Present",
+      "status": "ongoing",
+      "category": "AI / Web App",
+      "shortDescription": "Voice-first, hyper-local marketplace app for Indonesian UMKM — buyers speak their order in casual Indonesian (slang and market dialects included) and the app turns it into a structured order for the seller.",
+      "story": "Instead of tapping through a cart UI, buyers record a voice order (VoiceRecorder + Web Audio API with live volume visualization). The audio is transcribed by Groq Whisper (whisper-large-v3-turbo), then Google Gemini (gemini-2.0-flash-lite) parses the transcript into a strict JSON order schema — extracting items, quantities, and units. Orders are saved to Firebase Realtime Database and streamed live to both the buyer's purchase report and the seller's dashboard, with a real-time status pipeline from IN_QUEUE through acknowledgment and payment.",
+      "funFacts": [
+        "Handles casual Indonesian slang like 'sekilo', 'setengah lusin', and 'sediter' — e.g. 'telor sepuluh biji' becomes { name: 'Telor', quantity: 10, unit: 'pcs' }.",
+        "Dual-role experience: users can switch between Buyer and Seller views via an IdentityContext.",
+        "Sellers get inventory management (PengelolaanBarang, ArusBarang) plus live dashboards with transaction lists, stats, and order review cards."
+      ],
+      "techStack": [
+        "React 19",
+        "Vite",
+        "Groq API (Whisper large v3 turbo)",
+        "Google Gemini API",
+        "Firebase Realtime Database",
+        "Web Audio API",
+        "lucide-react"
+      ],
+      "links": {
+        "live": "",
+        "github": ""
+      },
+      "screenshot": "/screenshots/projects/ngomongaja.png"
     }
   ],
   "experience": [
@@ -130,14 +158,14 @@
       "title": "Academic Events Manager — HIMTI (Informatics Student Association), BINUS Semarang",
       "dates": "2025/2026",
       "description": "Planned and managed academic events; coordinated logistics and cross-departmental partnerships. Previously Event Chair for an industry company visit activity.",
-      "photo": "/screenshots/experience/himti.jpg"
+      "photo": "/screenshots/experience/HIMTI.JPG"
     },
     {
       "id": "gki-event-organizer",
       "title": "Event Organizer — GKI Beringin Church, Semarang",
       "dates": "2024",
       "description": "Organized the church community's Independence Day celebration; managed volunteers and event logistics.",
-      "photo": "/screenshots/experience/gki-event.jpg"
+      "photo": "/screenshots/experience/GKI.jpg"
     }
   ],
   "achievements": [

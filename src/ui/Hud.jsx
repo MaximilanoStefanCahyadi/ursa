@@ -1,4 +1,9 @@
-export default function Hud({ legend }) {
+export default function Hud({ sky, showExperience }) {
+  const legend = [
+    ...sky.clusters,
+    ...(showExperience && sky.experienceCluster ? [sky.experienceCluster] : []),
+  ]
+
   return (
     <>
       <header className="hud-title">

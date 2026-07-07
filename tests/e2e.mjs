@@ -1,4 +1,4 @@
-// Phase 1 end-to-end smoke test for the constellation sky.
+// Phase 1 + 2 end-to-end smoke test for the constellation sky.
 // Run with the dev server up:  node tests/e2e.mjs [baseUrl]
 import { chromium } from 'playwright'
 
@@ -14,26 +14,26 @@ async function starPositions(page) {
   return page.evaluate(async () => {
     const { computeSky } = await import('/src/lib/layout.js')
     const data = (await import('/src/data/projects.json')).default
-    const sky = computeSky(data.projects)
+    const sky = computeSky(data)
     const fov = 55
     const z = 58
     const hh = Math.tan((fov * Math.PI) / 360)
     const hw = hh * (innerWidth / innerHeight)
+    const project = (n) => ({
+      x: Math.round(((n.x / (hw * z)) + 1) / 2 * innerWidth),
+      y: Math.round((1 - n.y / (hh * z)) / 2 * innerHeight),
+      title: n.title,
+    })
     return Object.fromEntries(
-      sky.nodes.map((n) => [
-        n.id,
-        {
-          x: Math.round(((n.x / (hw * z)) + 1) / 2 * innerWidth),
-          y: Math.round((1 - n.y / (hh * z)) / 2 * innerHeight),
-          title: n.title,
-        },
-      ]),
+      [...sky.projectNodes, ...sky.experienceNodes].map((n) => [n.id, project(n)]),
     )
   })
 }
 
 const browser = await chromium.launch({ channel: 'chrome', headless: true }).catch(() => chromium.launch({ headless: true }))
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } })
+const pageErrors = []
+page.on('pageerror', (e) => pageErrors.push(String(e)))
 await page.goto(BASE)
 await page.waitForSelector('.sky-canvas canvas')
 await page.waitForTimeout(1200) // let the camera settle
@@ -41,6 +41,10 @@ await page.waitForTimeout(1200) // let the camera settle
 const stars = await starPositions(page)
 const anzen = stars['anzen-smart-door']
 const research = stars['attention-recovery-research']
+const ngomongaja = stars['ngomongaja']
+const slc = stars['slc-lab-assistant']
+
+// ---------- Phase 1 regressions ----------
 
 // 1. hover shows the star's name
 await page.mouse.move(anzen.x, anzen.y, { steps: 5 })
@@ -76,7 +80,97 @@ check('missing screenshot falls back gracefully', (await page.locator('.placard-
 await page.locator('.placard-close').click()
 await page.waitForTimeout(300)
 
-// 5. drag pans the sky (cluster labels shift)
+// 5. new project star (NgomongAja, 2026 – Present)
+await page.mouse.click(ngomongaja.x, ngomongaja.y)
+await page.waitForSelector('.placard', { timeout: 3000 })
+check(
+  'NgomongAja placard opens as ongoing',
+  (await page.locator('.placard h2').textContent()) === 'NgomongAja' &&
+    (await page.locator('.status-badge.ongoing').count()) === 1,
+)
+check('NgomongAja screenshot renders', (await page.locator('.placard-frame img').count()) === 1)
+await page.keyboard.press('Escape')
+await page.waitForTimeout(300)
+
+// ---------- Phase 2: filter dropdown ----------
+
+// 6. dropdown opens with constellation + period sections
+await page.locator('.filter-toggle').click()
+await page.waitForSelector('.filter-panel', { timeout: 2000 })
+const chipTexts = await page.locator('.filter-chip').allTextContents()
+check(
+  'filter panel lists categories and years',
+  chipTexts.includes('Machine Learning') && chipTexts.includes('2026') && chipTexts.includes('2024'),
+  chipTexts.join(', '),
+)
+
+// framer-motion whileHover keeps chips "unstable" for Playwright's
+// actionability check — click them directly in the DOM instead
+const clickChip = (text) =>
+  page
+    .locator('.filter-chip', { hasText: text })
+    .first()
+    .evaluate((el) => el.click())
+
+// 7. selecting a category dims other constellation labels
+await clickChip('Machine Learning')
+await page.waitForTimeout(700)
+const iotDim = await page
+  .locator('.cluster-label', { hasText: 'IoT' })
+  .evaluate((el) => el.classList.contains('dim'))
+const mlDim = await page
+  .locator('.cluster-label', { hasText: 'Machine Learning' })
+  .evaluate((el) => el.classList.contains('dim'))
+check('category filter dims non-matching labels', iotDim && !mlDim)
+
+// 8. dimmed star no longer opens a placard
+await page.mouse.click(1150, 650) // empty sky: close the panel first so it can't swallow the click
+await page.waitForTimeout(400)
+await page.mouse.click(anzen.x, anzen.y)
+await page.waitForTimeout(400)
+check('dimmed star is not clickable', (await page.locator('.placard').count()) === 0)
+
+// 9. reset to All restores
+await page.locator('.filter-toggle').click()
+await page.waitForSelector('.filter-panel')
+await page.waitForTimeout(600) // let the entrance animation settle
+await clickChip('All') // "All" constellation
+await page.waitForTimeout(500)
+const iotDimAfter = await page
+  .locator('.cluster-label', { hasText: 'IoT' })
+  .evaluate((el) => el.classList.contains('dim'))
+check('reset filter undims labels', !iotDimAfter)
+await page.mouse.click(640, 60) // close panel on empty sky
+await page.waitForTimeout(300)
+
+// ---------- Phase 2: experience layer ----------
+
+// 10. toggle shows the experience constellation
+check('experience label hidden before toggle', await page
+  .locator('.cluster-label.experience')
+  .evaluate((el) => el.classList.contains('hidden')))
+await page.locator('.layer-toggle').click()
+await page.waitForTimeout(800)
+check('layer toggle turns on', await page.locator('.layer-toggle.on').count() === 1)
+check('experience label appears', await page
+  .locator('.cluster-label.experience')
+  .evaluate((el) => !el.classList.contains('hidden')))
+const legend = await page.locator('.legend-item').allTextContents()
+check('legend gains Experience entry', legend.some((t) => t.includes('Experience')), legend.join(', '))
+
+// 11. experience star opens an experience placard
+await page.mouse.click(slc.x, slc.y)
+await page.waitForSelector('.placard', { timeout: 3000 })
+const expTitle = await page.locator('.placard h2').textContent()
+check('experience placard opens', expTitle.includes('Laboratory Assistant'), expTitle)
+check('experience badge shown', (await page.locator('.status-badge.experience').count()) === 1)
+check('experience has no tech chips/links', (await page.locator('.tech-chip').count()) === 0 && (await page.locator('.placard-links a').count()) === 0)
+check('experience photo renders', (await page.locator('.placard-frame img').count()) === 1)
+await page.keyboard.press('Escape')
+await page.waitForTimeout(300)
+
+// ---------- camera (kept last: pan/zoom invalidate star coords) ----------
+
 const labelX = () => page.locator('.cluster-label').first().evaluate((el) => el.getBoundingClientRect().left)
 const beforePan = await labelX()
 await page.mouse.move(640, 500)
@@ -87,14 +181,12 @@ await page.waitForTimeout(500)
 const afterPan = await labelX()
 check('drag pans the sky', Math.abs(afterPan - beforePan) > 40, `moved ${Math.round(afterPan - beforePan)}px`)
 
-// 6. inertia: sky keeps gliding briefly after release
 await page.waitForTimeout(50)
 const glideA = await labelX()
 await page.waitForTimeout(350)
 const glideB = await labelX()
 check('release inertia keeps gliding', Math.abs(glideB - glideA) > 2, `glided ${Math.round(glideB - glideA)}px`)
 
-// 7. wheel zooms (cluster label gap grows)
 const gap = () =>
   page.evaluate(() => {
     const l = [...document.querySelectorAll('.cluster-label')]
@@ -107,10 +199,7 @@ await page.waitForTimeout(700)
 const afterZoom = await gap()
 check('wheel zooms in', afterZoom > beforeZoom * 1.15, `${Math.round(beforeZoom)} -> ${Math.round(afterZoom)}px`)
 
-// 8. no console errors during the whole run
-const errors = []
-page.on('pageerror', (e) => errors.push(String(e)))
-check('no page errors', errors.length === 0, errors.join('; '))
+check('no page errors', pageErrors.length === 0, pageErrors.join('; '))
 
 await browser.close()
 const failed = results.filter((r) => !r.ok)

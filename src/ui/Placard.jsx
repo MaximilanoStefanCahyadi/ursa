@@ -18,6 +18,8 @@ export default function Placard({ project, onClose }) {
   if (!project) return null
 
   const { links = {} } = project
+  const isExperience = project.kind === 'experience'
+  const image = isExperience ? project.photo : project.screenshot
 
   return (
     <div className="placard-backdrop" onClick={onClose}>
@@ -26,10 +28,10 @@ export default function Placard({ project, onClose }) {
           ×
         </button>
         <div className="placard-frame">
-          {!imgFailed ? (
+          {!imgFailed && image ? (
             <img
-              src={project.screenshot}
-              alt={`Screenshot of ${project.title}`}
+              src={image}
+              alt={isExperience ? project.title : `Screenshot of ${project.title}`}
               onError={() => setImgFailed(true)}
             />
           ) : (
@@ -44,18 +46,25 @@ export default function Placard({ project, onClose }) {
             <h2>{project.title}</h2>
             <div className="placard-meta">
               <span className="placard-dates">{project.dates}</span>
-              <span className={`status-badge ${project.status}`}>
-                {project.status === 'ongoing' ? (
-                  <>
-                    <span className="pulse-star">✦</span> in progress
-                  </>
-                ) : (
-                  <>● live</>
-                )}
-              </span>
+              {isExperience ? (
+                <span className="status-badge experience">☾ experience</span>
+              ) : (
+                <span className={`status-badge ${project.status}`}>
+                  {project.status === 'ongoing' ? (
+                    <>
+                      <span className="pulse-star">✦</span> in progress
+                    </>
+                  ) : (
+                    <>● live</>
+                  )}
+                </span>
+              )}
             </div>
           </div>
-          <p className="placard-desc">{project.shortDescription}</p>
+          {project.shortDescription && <p className="placard-desc">{project.shortDescription}</p>}
+          {isExperience && project.description && (
+            <p className="placard-desc">{project.description}</p>
+          )}
           {project.story && <p className="placard-story">{project.story}</p>}
           {project.techStack?.length > 0 && (
             <div className="placard-tech">
