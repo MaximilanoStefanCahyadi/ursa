@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export default function Placard({ project, onClose }) {
+export default function Placard({ project, onClose, onEnterGallery }) {
   const [imgFailed, setImgFailed] = useState(false)
 
   useEffect(() => {
@@ -75,8 +75,13 @@ export default function Placard({ project, onClose }) {
               ))}
             </div>
           )}
-          {(links.github || links.live) && (
+          {(links.github || links.live || (!isExperience && onEnterGallery)) && (
             <div className="placard-links">
+              {!isExperience && onEnterGallery && (
+                <button className="enter-gallery" onClick={() => onEnterGallery(project)}>
+                  ✦ Enter Gallery
+                </button>
+              )}
               {links.live && (
                 <a href={links.live} target="_blank" rel="noreferrer">
                   Visit live ↗

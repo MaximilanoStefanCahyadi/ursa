@@ -63,5 +63,10 @@ node tests/e2e.mjs
 
 - **Phase 1 — done:** constellation sky, zoom/pan with inertia, hover tooltips,
   museum placard modal, pulsing in-progress stars.
-- **Phase 2:** period/category filter, experience-constellation layer toggle.
-- **Phase 3:** first-person 3D gallery room per project ("Enter Gallery").
+- **Phase 2 — done:** animated constellation/period filter with smooth dimming,
+  experience-constellation layer toggle with its own placard variant.
+- **Phase 3 — done:** "Enter Gallery" warp transition into a first-person
+  rotunda gallery (WASD + pointer lock, one wall per project, PBR frames,
+  per-painting spotlights, soft shadows, reflective floor, ACES tone mapping).
+  Aiming at a painting and clicking opens the full inspect overlay with story,
+  fun facts, tech, and links. The rotunda grows automatically with the JSON.

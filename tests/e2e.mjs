@@ -165,9 +165,65 @@ const expTitle = await page.locator('.placard h2').textContent()
 check('experience placard opens', expTitle.includes('Laboratory Assistant'), expTitle)
 check('experience badge shown', (await page.locator('.status-badge.experience').count()) === 1)
 check('experience has no tech chips/links', (await page.locator('.tech-chip').count()) === 0 && (await page.locator('.placard-links a').count()) === 0)
+check('experience placard has no Enter Gallery', (await page.locator('.enter-gallery').count()) === 0)
 check('experience photo renders', (await page.locator('.placard-frame img').count()) === 1)
 await page.keyboard.press('Escape')
 await page.waitForTimeout(300)
+
+// ---------- Phase 3: gallery ----------
+
+// 12. project placards do get the gallery button
+await page.locator('.layer-toggle').click() // layer off again
+await page.waitForTimeout(400)
+await page.mouse.click(anzen.x, anzen.y)
+await page.waitForSelector('.placard', { timeout: 3000 })
+check('project placard has Enter Gallery button', (await page.locator('.enter-gallery').count()) === 1)
+
+// 13. warp transition plays, then the gallery room appears
+await page.locator('.enter-gallery').click()
+check('warp transition starts', (await page.waitForSelector('.warp-canvas', { timeout: 2000 }).then(() => true).catch(() => false)))
+await page.waitForSelector('.gallery-canvas canvas', { timeout: 6000 })
+check('gallery room renders', true)
+check('sky is unmounted in gallery', (await page.locator('.sky-canvas').count()) === 0)
+await page.waitForTimeout(1500) // textures + reflector warm-up
+
+// 14. WASD walking moves the camera
+const camBefore = await page.evaluate(() => window.__ursaCam)
+await page.keyboard.down('w')
+await page.waitForTimeout(700)
+await page.keyboard.up('w')
+await page.waitForTimeout(400)
+const camAfter = await page.evaluate(() => window.__ursaCam)
+const walked = Math.hypot(camAfter[0] - camBefore[0], camAfter[2] - camBefore[2])
+check('WASD walks the camera', walked > 0.8, `moved ${walked.toFixed(2)} units`)
+
+// 15. entered painting is dead ahead: crosshair aims at it
+const aimHint = await page.locator('.gallery-hint').textContent()
+check('crosshair aims at entered painting', aimHint.includes('Anzen'), aimHint)
+
+// 16. click opens the full inspect overlay (locked or not, both paths converge)
+await page.mouse.click(640, 400)
+await page.waitForTimeout(500)
+if ((await page.locator('.inspect').count()) === 0) {
+  // first click only acquired pointer lock — click again through the crosshair
+  await page.mouse.click(640, 400)
+}
+await page.waitForSelector('.inspect', { timeout: 3000 })
+const inspectTitle = await page.locator('.inspect h2').textContent()
+check('inspect overlay opens for aimed painting', inspectTitle === 'Anzen Smart Door Lock System', inspectTitle)
+check('inspect shows fun facts', (await page.locator('.inspect-facts li').count()) === 4)
+check('inspect shows story', (await page.locator('.inspect .placard-story').count()) === 1)
+check('inspect shows tech chips', (await page.locator('.inspect .tech-chip').count()) === 11)
+check('inspect shows live link', (await page.locator('.inspect .placard-links a').count()) === 1)
+
+// 17. escape closes the overlay, exit returns to the sky
+await page.keyboard.press('Escape')
+await page.waitForTimeout(400)
+check('escape closes inspect overlay', (await page.locator('.inspect').count()) === 0)
+await page.locator('.gallery-exit').click()
+await page.waitForSelector('.sky-canvas canvas', { timeout: 4000 })
+check('return to the sky works', (await page.locator('.gallery-canvas').count()) === 0)
+await page.waitForTimeout(1200) // let the sky camera settle again
 
 // ---------- camera (kept last: pan/zoom invalidate star coords) ----------
 

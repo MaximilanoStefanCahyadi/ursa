@@ -36,5 +36,35 @@ await page.mouse.click(slc.x, slc.y)
 await page.waitForSelector('.placard')
 await page.waitForTimeout(600)
 await page.screenshot({ path: dir + '/exp-placard.png' })
+await page.keyboard.press('Escape')
+await page.locator('.layer-toggle').click()
+await page.waitForTimeout(400)
+
+// gallery room + inspect overlay
+const anzen = await page.evaluate(async () => {
+  const { computeSky } = await import('/src/lib/layout.js')
+  const data = (await import('/src/data/projects.json')).default
+  const n = computeSky(data).projectNodes.find((n) => n.id === 'anzen-smart-door')
+  const hh = Math.tan((55 * Math.PI) / 360), hw = hh * (innerWidth / innerHeight)
+  return { x: Math.round(((n.x / (hw * 58)) + 1) / 2 * innerWidth), y: Math.round((1 - n.y / (hh * 58)) / 2 * innerHeight) }
+})
+await page.mouse.click(anzen.x, anzen.y)
+await page.waitForSelector('.placard')
+await page.locator('.enter-gallery').click()
+await page.waitForSelector('.gallery-canvas canvas', { timeout: 6000 })
+await page.waitForTimeout(2500) // textures + reflections warm-up
+await page.screenshot({ path: dir + '/gallery.png' })
+// step back for a wider view
+await page.keyboard.down('s')
+await page.waitForTimeout(650)
+await page.keyboard.up('s')
+await page.waitForTimeout(500)
+await page.screenshot({ path: dir + '/gallery-wide.png' })
+await page.mouse.click(640, 400)
+await page.waitForTimeout(300)
+if (!(await page.locator('.inspect').count())) await page.mouse.click(640, 400)
+await page.waitForSelector('.inspect')
+await page.waitForTimeout(600)
+await page.screenshot({ path: dir + '/inspect.png' })
 await browser.close()
 console.log('done')
