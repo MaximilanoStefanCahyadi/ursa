@@ -28,8 +28,8 @@
         "Raspberry Pi"
       ],
       "links": {
-        "live": "https://face-door-recog.vercel.app",
-        "github": ""
+        "live": "https://anzen-door.vercel.app",
+        "github": "https://github.com/MaximilanoStefanCahyadi/Anzen"
       },
       "screenshot": "/screenshots/projects/anzen.png"
     },
@@ -57,8 +57,8 @@
         "SMOTE"
       ],
       "links": {
-        "live": "",
-        "github": ""
+        "live": "https://prediction-bank-churn.streamlit.app/",
+        "github": "https://github.com/MaximilanoStefanCahyadi/churn"
       },
       "screenshot": "/screenshots/projects/churn.png"
     },
@@ -86,8 +86,8 @@
         "NumPy"
       ],
       "links": {
-        "live": "",
-        "github": ""
+        "live": "https://phisinc.streamlit.app/",
+        "github": "https://github.com/MaximilanoStefanCahyadi/PhisInc"
       },
       "screenshot": "/screenshots/projects/phisinc.png"
     },

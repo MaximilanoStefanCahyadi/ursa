@@ -25,6 +25,9 @@ export function computeSky(data) {
   const tpos = (year) => (max === min ? 0.5 : (year - min) / (max - min))
 
   const placeNodes = (parsed, getBand, getColor, kind, spreadStep) => {
+    const isExperience = kind === 'experience'
+    // width of one year's slot on the time axis
+    const slotWidth = 56 / Math.max(max - min, 1)
     const byYear = new Map()
     for (const p of parsed) {
       if (!byYear.has(p.start)) byYear.set(p.start, [])
@@ -34,8 +37,13 @@ export function computeSky(data) {
       const group = byYear.get(p.start)
       const gi = group.indexOf(p)
       const baseX = (tpos(p.start) - 0.5) * 56
-      const spread = (gi - (group.length - 1) / 2) * spreadStep
-      const jx = (hash01(p.item.id) - 0.5) * 9
+      // experience stars share one band, so a year group must not spill into
+      // the neighboring year's slot (projects separate by category band instead)
+      const step = isExperience
+        ? Math.max(3, Math.min(spreadStep, (slotWidth - 12) / Math.max(group.length - 1, 1)))
+        : spreadStep
+      const spread = (gi - (group.length - 1) / 2) * step
+      const jx = (hash01(p.item.id) - 0.5) * (isExperience ? 4 : 9)
       const jy = (hash01(p.item.id + ':y') - 0.5) * 7
       return {
         ...p.item,
@@ -46,11 +54,11 @@ export function computeSky(data) {
         ongoing: p.ongoing || p.item.status === 'ongoing',
         color: getColor(p.item),
         x: baseX + spread + jx,
-        y:
-          kind === 'experience'
-            ? EXPERIENCE_BAND + jy * 0.6
-            : BANDS[getBand.index(p.item) % BANDS.length] + jy,
-        size: (kind === 'experience' ? 0.85 : 1) + hash01(p.item.id + ':s') * 0.5,
+        y: isExperience
+          ? // zigzag within each year group so neighbors never blob together
+            EXPERIENCE_BAND + ((gi % 2) * 3 - 1.5) + jy * 0.4
+          : BANDS[getBand.index(p.item) % BANDS.length] + jy,
+        size: (isExperience ? 0.85 : 1) + hash01(p.item.id + ':s') * 0.5,
       }
     })
   }
