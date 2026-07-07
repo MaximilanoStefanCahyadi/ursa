@@ -1,10 +1,55 @@
 import { useMemo, useRef, useCallback } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { MeshReflectorMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 import { computeGallery } from '../../lib/galleryLayout'
+import { hash01 } from '../../lib/dates'
+import { getDotTexture } from '../../lib/starTexture'
 import Painting from './Painting'
 import PlayerControls from './PlayerControls'
+
+// the main menu's starfield, wrapped over the rotunda as an open night sky
+function DomeStars({ count, domeRadius, size, opacity, phase = 0 }) {
+  const geometry = useMemo(() => {
+    const positions = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      const az = hash01(`daz${phase}:${i}`) * Math.PI * 2
+      const el = Math.asin(0.1 + 0.9 * hash01(`del${phase}:${i}`)) // keep above the walls
+      const r = domeRadius * (0.85 + 0.3 * hash01(`dr${phase}:${i}`))
+      positions[i * 3] = Math.sin(az) * Math.cos(el) * r
+      positions[i * 3 + 1] = Math.sin(el) * r
+      positions[i * 3 + 2] = Math.cos(az) * Math.cos(el) * r
+    }
+    const g = new THREE.BufferGeometry()
+    g.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    return g
+  }, [count, domeRadius, phase])
+
+  const material = useRef()
+  useFrame(({ clock }) => {
+    if (material.current) {
+      material.current.opacity =
+        opacity * (0.78 + 0.22 * Math.sin(clock.elapsedTime * 0.7 + phase))
+    }
+  })
+
+  return (
+    <points geometry={geometry}>
+      <pointsMaterial
+        ref={material}
+        map={getDotTexture()}
+        color="#cdd8ff"
+        size={size}
+        sizeAttenuation
+        transparent
+        opacity={opacity}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        fog={false}
+      />
+    </points>
+  )
+}
 
 function PaintingSpot({ entry, apothem, height }) {
   const target = useMemo(() => {
@@ -71,10 +116,12 @@ export default function GalleryRoom({ projects, enteredId, onInspect, onAim, uiO
           <cylinderGeometry args={[radius, radius, height, sides, 1, true, thetaStart, Math.PI * 2]} />
           <meshStandardMaterial color="#12141f" roughness={0.92} metalness={0.05} side={THREE.BackSide} />
         </mesh>
-        {/* ceiling */}
+        {/* open ceiling: the sky from the main menu, plus a gold trim ring */}
+        <DomeStars count={700} domeRadius={radius * 3.2} size={0.28} opacity={0.85} phase={0} />
+        <DomeStars count={220} domeRadius={radius * 2.4} size={0.5} opacity={0.95} phase={3} />
         <mesh position={[0, height, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[radius + 0.5, sides]} />
-          <meshStandardMaterial color="#07080f" roughness={0.95} />
+          <torusGeometry args={[radius * 0.985, 0.07, 12, sides]} />
+          <meshStandardMaterial color="#8a6d3b" metalness={0.65} roughness={0.35} />
         </mesh>
         {/* reflective floor */}
         <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
