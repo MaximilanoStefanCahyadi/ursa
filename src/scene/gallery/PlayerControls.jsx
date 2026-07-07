@@ -8,25 +8,58 @@ const SPEED = 4.2
 
 // WASD + pointer-lock look; while locked, clicks raycast from the crosshair.
 // `registry.current` maps project id -> { mesh, project } (filled by Painting).
-export default function PlayerControls({ walkRadius, registry, onInspect, onAim }) {
+export default function PlayerControls({ walkRadius, registry, onInspect, onAim, uiOpen }) {
   const { camera, gl } = useThree()
   const keys = useRef({})
   const vel = useRef(new THREE.Vector3())
   const aimed = useRef(null)
   const controlsRef = useRef()
+  const uiOpenRef = useRef(uiOpen)
+  uiOpenRef.current = uiOpen
 
   useEffect(() => {
     camera.position.set(0, EYE, 0)
     camera.rotation.set(0, 0, 0) // face -z (the entered painting); R3F leaves the camera looking at the origin, i.e. straight down
-    const down = (e) => (keys.current[e.code] = true)
+
+    const locked = () => document.pointerLockElement === gl.domElement
+    const tryLock = () => {
+      if (locked() || uiOpenRef.current) return
+      try {
+        // three's controls.lock() discards the promise; catch rejections ourselves
+        gl.domElement.requestPointerLock()?.catch?.(() => {})
+      } catch {
+        /* pointer lock unavailable — click-to-inspect fallback still works */
+      }
+    }
+
+    // camera cursor by default: the Enter Gallery click's user activation
+    // is still fresh (the warp runs ~1.5s), so locking here is permitted
+    tryLock()
+
+    const down = (e) => {
+      keys.current[e.code] = true
+      // Shift toggles between camera (locked) and mouse cursor
+      if (e.key === 'Shift' && !e.repeat) {
+        if (locked()) document.exitPointerLock()
+        else tryLock()
+      }
+    }
     const up = (e) => (keys.current[e.code] = false)
     window.addEventListener('keydown', down)
     window.addEventListener('keyup', up)
 
-    // aiming at a painting -> inspect it; otherwise grab the cursor
     const onClick = () => {
-      if (aimed.current) onInspect(aimed.current)
-      else if (document.pointerLockElement !== gl.domElement) controlsRef.current?.lock()
+      if (locked()) {
+        // camera mode: the crosshair is the pointer
+        if (aimed.current) onInspect(aimed.current)
+        return
+      }
+      // mouse-cursor mode: clicking the room re-enters camera mode; if the
+      // lock is denied (browser policy) fall back to inspecting the aim
+      tryLock()
+      setTimeout(() => {
+        if (!locked() && !uiOpenRef.current && aimed.current) onInspect(aimed.current)
+      }, 220)
     }
     gl.domElement.addEventListener('click', onClick)
     return () => {

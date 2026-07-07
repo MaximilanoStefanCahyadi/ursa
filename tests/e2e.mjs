@@ -60,7 +60,7 @@ check('placard opens with title', title === 'Anzen Smart Door Lock System', titl
 check('placard shows live badge', (await page.locator('.status-badge.live').count()) === 1)
 check('placard shows screenshot', (await page.locator('.placard-frame img').count()) === 1)
 check('placard tech chips', (await page.locator('.tech-chip').count()) === 11)
-check('placard live link only (no empty github)', (await page.locator('.placard-links a').count()) === 1)
+check('placard shows live + github links', (await page.locator('.placard-links a').count()) === 2)
 
 // 3. escape closes it
 await page.keyboard.press('Escape')
@@ -187,6 +187,16 @@ check('gallery room renders', true)
 check('sky is unmounted in gallery', (await page.locator('.sky-canvas').count()) === 0)
 await page.waitForTimeout(1500) // textures + reflector warm-up
 
+// 13b. camera cursor engages automatically; Shift toggles the mouse cursor
+const isLocked = () => page.evaluate(() => !!document.pointerLockElement)
+check('gallery auto-grabs the camera cursor', await isLocked())
+await page.keyboard.press('Shift')
+await page.waitForTimeout(300)
+check('Shift frees the mouse cursor', !(await isLocked()))
+await page.keyboard.press('Shift')
+await page.waitForTimeout(400)
+check('Shift re-grabs the camera cursor', await isLocked())
+
 // 14. WASD walking moves the camera
 const camBefore = await page.evaluate(() => window.__ursaCam)
 await page.keyboard.down('w')
@@ -214,7 +224,7 @@ check('inspect overlay opens for aimed painting', inspectTitle === 'Anzen Smart 
 check('inspect shows fun facts', (await page.locator('.inspect-facts li').count()) === 4)
 check('inspect shows story', (await page.locator('.inspect .placard-story').count()) === 1)
 check('inspect shows tech chips', (await page.locator('.inspect .tech-chip').count()) === 11)
-check('inspect shows live link', (await page.locator('.inspect .placard-links a').count()) === 1)
+check('inspect shows live + github links', (await page.locator('.inspect .placard-links a').count()) === 2)
 
 // 17. escape closes the overlay, exit returns to the sky
 await page.keyboard.press('Escape')

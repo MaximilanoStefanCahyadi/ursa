@@ -73,6 +73,7 @@ export default function App() {
             enteredId={galleryEntry?.id}
             onInspect={inspect}
             onAim={setAimed}
+            uiOpen={!!inspected}
           />
           <GalleryHud aimed={aimed} onExit={exitGallery} />
           {inspected && <InspectOverlay project={inspected} onClose={() => setInspected(null)} />}

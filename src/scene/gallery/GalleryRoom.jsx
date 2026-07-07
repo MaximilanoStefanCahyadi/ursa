@@ -36,7 +36,7 @@ function PaintingSpot({ entry, apothem, height }) {
   )
 }
 
-export default function GalleryRoom({ projects, enteredId, onInspect, onAim }) {
+export default function GalleryRoom({ projects, enteredId, onInspect, onAim, uiOpen }) {
   const layout = useMemo(() => computeGallery(projects, enteredId), [projects, enteredId])
   const registry = useRef({})
 
@@ -106,6 +106,7 @@ export default function GalleryRoom({ projects, enteredId, onInspect, onAim }) {
           registry={registry}
           onInspect={onInspect}
           onAim={onAim}
+          uiOpen={uiOpen}
         />
       </Canvas>
     </div>
