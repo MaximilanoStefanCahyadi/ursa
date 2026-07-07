@@ -1,0 +1,150 @@
+{
+  "projects": [
+    {
+      "id": "anzen-smart-door",
+      "title": "Anzen Smart Door Lock System",
+      "dates": "2025 – 2026",
+      "status": "live",
+      "category": "IoT",
+      "shortDescription": "Real-time IoT security system with dual-mode authentication: facial recognition and cryptographically secure one-time QR guest passes, running on a Raspberry Pi edge node.",
+      "story": "The Raspberry Pi acts as the edge brain: it processes webcam frames, runs 128-dimension face encodings via face_recognition/dlib, scans QR codes with pyzbar, and drives a 12V solenoid lock through an active-low 5V relay on GPIO 17 using gpiozero. Everything syncs in real time through Firebase Realtime Database with a React 19 + TypeScript + Vite admin dashboard and a Capacitor-wrapped Android app.",
+      "funFacts": [
+        "Face recognition runs on every 3rd frame with frames resized to 25% and the 'small' model for 5x faster processing on the Pi.",
+        "A background daemon thread sweeps and invalidates expired guest tokens every 60 seconds.",
+        "The solenoid must never be wired to GPIO directly — its current draw would instantly fry the Pi, so a 3S LiPo battery drives it through an optocoupler relay.",
+        "Firebase logging runs in an asynchronous background thread so database writes never block the camera loop."
+      ],
+      "techStack": [
+        "Python",
+        "OpenCV",
+        "face_recognition (dlib)",
+        "pyzbar",
+        "gpiozero",
+        "Firebase Realtime Database",
+        "React 19",
+        "TypeScript",
+        "Vite",
+        "Capacitor",
+        "Raspberry Pi"
+      ],
+      "links": {
+        "live": "https://face-door-recog.vercel.app",
+        "github": ""
+      },
+      "screenshot": "/screenshots/projects/anzen.png"
+    },
+    {
+      "id": "bank-churn-intelligence",
+      "title": "Bank Customer Churn Intelligence",
+      "dates": "2025",
+      "status": "live",
+      "category": "Data Science",
+      "shortDescription": "Interactive Streamlit dashboard predicting bank customer churn with Gradient Boosting models, featuring real-time predictions and a dual-theme glassmorphism UI.",
+      "story": "Two pre-trained Gradient Boosting classifiers — a base model and a SMOTE-optimized model for class imbalance — are compared side by side with ROC curves, precision-recall curves, and confusion matrices. The predictor shows churn probability on an animated circular gauge with color-coded risk badges, backed by full EDA: churn by product count, demographics, KDE distributions, correlation heatmaps, and feature importance rankings.",
+      "funFacts": [
+        "The dashboard has full dark/light dual theming with glassmorphism cards — even the Matplotlib charts adapt to the selected theme.",
+        "Trained on a dataset of 10,000 bank customers with 10 input features from credit score to estimated salary.",
+        "Includes an interactive data explorer with filters by churn status, country, and age range."
+      ],
+      "techStack": [
+        "Python",
+        "Streamlit",
+        "scikit-learn 1.6.1",
+        "pandas",
+        "NumPy",
+        "Matplotlib",
+        "Seaborn",
+        "SMOTE"
+      ],
+      "links": {
+        "live": "",
+        "github": ""
+      },
+      "screenshot": "/screenshots/projects/churn.png"
+    },
+    {
+      "id": "phisinc",
+      "title": "PhisInc — Phishing URL Detection System",
+      "dates": "2025",
+      "status": "live",
+      "category": "Machine Learning",
+      "shortDescription": "Streamlit web app that detects phishing websites in real time by extracting 30 security features from any URL and classifying it with a Gradient Boosting model.",
+      "story": "PhisInc analyzes a URL across four feature categories — address bar signals, abnormal URL patterns, HTML & JavaScript behavior, and domain reputation — covering everything from IP-based domains and URL shorteners to hidden iframes, disabled right-click, WHOIS domain age, and Google indexing. Results are shown instantly with a visual confidence indicator in a dark glassmorphic, fully bilingual (Indonesian) interface.",
+      "funFacts": [
+        "Extracts exactly 30 security indicators per URL, from the '@' symbol trick to status-bar manipulation via JavaScript.",
+        "Uses BeautifulSoup4, Requests, python-whois, and lxml to scrape and analyze live page content and domain registration data.",
+        "The interface is presented in Bahasa Indonesia with standard industry terminology."
+      ],
+      "techStack": [
+        "Python 3.10",
+        "Streamlit",
+        "scikit-learn 1.3.2",
+        "Gradient Boosting",
+        "BeautifulSoup4",
+        "python-whois",
+        "pandas",
+        "NumPy"
+      ],
+      "links": {
+        "live": "",
+        "github": ""
+      },
+      "screenshot": "/screenshots/projects/phisinc.png"
+    },
+    {
+      "id": "attention-recovery-research",
+      "title": "Attention Recovery with Neuro-Cognitive Indicators",
+      "dates": "2025 – Present",
+      "status": "ongoing",
+      "category": "Research",
+      "shortDescription": "Ongoing research at BINUS investigating neuro-cognitive indicators for measuring and facilitating attention recovery using computational analysis methods.",
+      "story": "University research project exploring how neuro-cognitive signals can indicate and support attention recovery, analyzed through computational methods.",
+      "funFacts": [],
+      "techStack": [
+        "Python"
+      ],
+      "links": {
+        "live": "",
+        "github": ""
+      },
+      "screenshot": "/screenshots/projects/attention-research.png"
+    }
+  ],
+  "experience": [
+    {
+      "id": "slc-lab-assistant",
+      "title": "Junior Laboratory Assistant — Software Laboratory Center (SLC), BINUS",
+      "dates": "2024 – Present",
+      "description": "Conducted lab sessions and mentoring for 6 courses: Algorithm & Programming, Data Structures (C), Computer Vision, Scientific Computing (Python), Human–Computer Interactions (HTML/CSS/JS), and Programming for Business (MySQL/PHP). Designed assessments and provided academic support each term.",
+      "photo": "/screenshots/experience/Laboratory_Assistant.jpg"
+    },
+    {
+      "id": "freshmen-leader",
+      "title": "Freshmen Leader (Peer Mentor) — BINUS",
+      "dates": "2024",
+      "description": "Guided incoming first-year Computer Science students through orientation and academic adaptation.",
+      "photo": "/screenshots/experience/Freshman_Leader.jpg"
+    },
+    {
+      "id": "himti-academic-events",
+      "title": "Academic Events Manager — HIMTI (Informatics Student Association), BINUS Semarang",
+      "dates": "2025/2026",
+      "description": "Planned and managed academic events; coordinated logistics and cross-departmental partnerships. Previously Event Chair for an industry company visit activity.",
+      "photo": "/screenshots/experience/himti.jpg"
+    },
+    {
+      "id": "gki-event-organizer",
+      "title": "Event Organizer — GKI Beringin Church, Semarang",
+      "dates": "2024",
+      "description": "Organized the church community's Independence Day celebration; managed volunteers and event logistics.",
+      "photo": "/screenshots/experience/gki-event.jpg"
+    }
+  ],
+  "achievements": [
+    {
+      "id": "ugm-hackathon",
+      "title": "19th Place — Data Science Hackathon, Universitas Gadjah Mada (UGM)",
+      "dates": "2025"
+    }
+  ]
+}
