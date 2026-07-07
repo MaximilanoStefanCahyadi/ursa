@@ -28,8 +28,8 @@
         "Raspberry Pi"
       ],
       "links": {
-        "live": "https://anzen-door.vercel.app",
-        "github": "https://github.com/MaximilanoStefanCahyadi/Anzen"
+        "live": "https://face-door-recog.vercel.app",
+        "github": ""
       },
       "screenshot": "/screenshots/projects/anzen.png"
     },
@@ -57,8 +57,8 @@
         "SMOTE"
       ],
       "links": {
-        "live": "https://prediction-bank-churn.streamlit.app/",
-        "github": "https://github.com/MaximilanoStefanCahyadi/churn"
+        "live": "",
+        "github": ""
       },
       "screenshot": "/screenshots/projects/churn.png"
     },
@@ -86,8 +86,8 @@
         "NumPy"
       ],
       "links": {
-        "live": "https://phisinc.streamlit.app/",
-        "github": "https://github.com/MaximilanoStefanCahyadi/PhisInc"
+        "live": "",
+        "github": ""
       },
       "screenshot": "/screenshots/projects/phisinc.png"
     },
@@ -144,21 +144,21 @@
       "title": "Junior Laboratory Assistant — Software Laboratory Center (SLC), BINUS",
       "dates": "2024 – Present",
       "description": "Conducted lab sessions and mentoring for 6 courses: Algorithm & Programming, Data Structures (C), Computer Vision, Scientific Computing (Python), Human–Computer Interactions (HTML/CSS/JS), and Programming for Business (MySQL/PHP). Designed assessments and provided academic support each term.",
-      "photo": "/screenshots/experience/Laboratory_Assistant.jpg"
+      "photo": "/screenshots/experience/slc-lab.jpg"
     },
     {
       "id": "freshmen-leader",
       "title": "Freshmen Leader (Peer Mentor) — BINUS",
       "dates": "2024",
       "description": "Guided incoming first-year Computer Science students through orientation and academic adaptation.",
-      "photo": "/screenshots/experience/Freshman_Leader.jpg"
+      "photo": "/screenshots/experience/freshmen-leader.jpg"
     },
     {
       "id": "himti-academic-events",
       "title": "Academic Events Manager — HIMTI (Informatics Student Association), BINUS Semarang",
       "dates": "2025/2026",
       "description": "Planned and managed academic events; coordinated logistics and cross-departmental partnerships. Previously Event Chair for an industry company visit activity.",
-      "photo": "/screenshots/experience/HIMTI.JPG"
+      "photo": "/screenshots/experience/himti.jpg"
     },
     {
       "id": "gki-event-organizer",
@@ -166,6 +166,20 @@
       "dates": "2024",
       "description": "Organized the church community's Independence Day celebration; managed volunteers and event logistics.",
       "photo": "/screenshots/experience/GKI.jpg"
+    },
+    {
+      "id": "gayengan-committee",
+      "title": "Committee — Gayengan, BINUS Semarang",
+      "dates": "2025",
+      "description": "Organized a team-building event for BINUS Semarang employees and served as both the MC and game master for the occasion.",
+      "photo": "/screenshots/experience/Gayengan_Committee.jpg"
+    },
+    {
+      "id": "character-building-volunteer",
+      "title": "Volunteer — Character Building",
+      "dates": "2025",
+      "description": "Taught children about religious tolerance at the mosque.",
+      "photo": "/screenshots/experience/Character_Building.jpg"
     }
   ],
   "achievements": [
